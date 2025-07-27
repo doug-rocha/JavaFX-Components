@@ -52,7 +52,8 @@ public class InternalWindow extends Pane {
     private Label header;
     private HBox headerBar;
 
-    private String controllerClass;
+    private String classId;
+    private InternalWindowContent controllerClass;
 
     /**
      * Creates a new instance
@@ -129,12 +130,40 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Set the ControllerClass String, it's used to identify itself to the
+     * Set the classId String, it's used to identify itself to the
      * {@link ChildListener}
      *
-     * @param controllerClass the ControllerClass String
+     * @param classId the ControllerClass String
      */
-    public void setControllerClass(String controllerClass) {
+    public void setClassId(String classId) {
+        this.classId = classId;
+    }
+
+    /**
+     * Gets the classId String, used to identify itself to the
+     * {@link ChildListener}
+     *
+     * @return the value of classId
+     */
+    public String getClassId() {
+        return classId;
+    }
+
+    /**
+     * Get the controllerClass
+     *
+     * @return the value of controllerClass
+     */
+    public InternalWindowContent getControllerClass() {
+        return controllerClass;
+    }
+
+    /**
+     * Set the ControllerClass field
+     *
+     * @param controllerClass the controllerClass field
+     */
+    public void setControllerClass(InternalWindowContent controllerClass) {
         this.controllerClass = controllerClass;
     }
 
@@ -224,14 +253,14 @@ public class InternalWindow extends Pane {
      * Notify all {@link ChildListener} when openned
      */
     protected void notifyOpenChild() {
-        childListeners.forEach(x -> x.onChildOpen(controllerClass));
+        childListeners.forEach(x -> x.onChildOpen(classId));
     }
 
     /**
      * Notify all {@link ChildListener} when closed
      */
     protected void notifyClosedChild() {
-        childListeners.forEach(x -> x.onChildClose(controllerClass));
+        childListeners.forEach(x -> x.onChildClose(classId));
     }
 
     private void initHeaderBar(String title) {
@@ -455,6 +484,9 @@ public class InternalWindow extends Pane {
      * {@link ChildListener} using {@link InternalWindow#notifyClosedChild() }
      */
     public void close() {
+        if (!controllerClass.canClose()) {
+            return;
+        }
         ((Pane) this.getParent()).getChildren().remove(this);
         notifyClosedChild();
     }
