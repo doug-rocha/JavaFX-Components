@@ -1,4 +1,4 @@
-package nonacept.javafx.listeners;
+package com.nonacept.javafx.listeners;
 
 /**
  * A listener for a class that is called from another, that needs to know when it's closed

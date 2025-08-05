@@ -1,4 +1,4 @@
-package nonacept.javafx.scene.manager;
+package com.nonacept.javafx.scene.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,10 +15,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import nonacept.javafx.listeners.ChildListener;
-import nonacept.javafx.scene.layout.InternalWindow;
-import nonacept.javafx.scene.layout.InternalWindowContent;
-import nonacept.javafx.scene.layout.InternalWindowInitializer;
+import com.nonacept.javafx.listeners.ChildListener;
+import com.nonacept.javafx.scene.layout.InternalWindow;
+import com.nonacept.javafx.scene.layout.InternalWindowContent;
+import com.nonacept.javafx.scene.layout.InternalWindowInitializer;
 
 /**
  *

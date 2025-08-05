@@ -1,4 +1,4 @@
-package nonacept.javafx.scene.layout;
+package com.nonacept.javafx.scene.layout;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,7 +22,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import nonacept.javafx.listeners.ChildListener;
+import com.nonacept.javafx.listeners.ChildListener;
 
 /**
  * A Node that works like a {@link javax.swing.JInternalFrame}, it can be a

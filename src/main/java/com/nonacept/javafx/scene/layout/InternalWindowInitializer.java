@@ -1,4 +1,4 @@
-package nonacept.javafx.scene.layout;
+package com.nonacept.javafx.scene.layout;
 
 import java.util.Objects;
 import javafx.stage.Stage;
