@@ -126,8 +126,8 @@ public class InternalWindowManager implements ChildListener {
             return iw;
         } catch (Exception ex) {
             System.out.println(ex);
+            throw new RuntimeException(ex.getMessage(), ex.getCause());
         }
-        return null;
     }
 
     public void siw(InternalWindow iw) {
