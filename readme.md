@@ -12,7 +12,7 @@ For this example, I will assume you already know a bit of JavaFX and have a `Pan
 First things first, we will create a `InternalWindowManager`, this is a singleton object with a builder like creation:
 
 ```java
-InternalWindowManager imw = InternalWindowManager.create().managing(contentPanel);
+InternalWindowManager iwm = InternalWindowManager.create().managing(contentPanel);
 ```
 After this the object `iwm` can be used to manage the creation of `InternalWindow`.<br>
 You have two methods to create `InternalWindow`, `createInternalWindow` and `createUniqueInternalWindow`.<br>
