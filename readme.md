@@ -12,7 +12,9 @@ For this example, I will assume you already know a bit of JavaFX and have a `Pan
 First things first, we will create a `InternalWindowManager`, this is a singleton object with a builder like creation:
 
 ```java
-InternalWindowManager iwm = InternalWindowManager.create().managing(contentPanel);
+InternalWindowManager iwm = InternalWindowManager
+        .create()
+        .managing(contentPanel);
 ```
 After this the object `iwm` can be used to manage the creation of `InternalWindow`.<br>
 You have two methods to create `InternalWindow`, `createInternalWindow` and `createUniqueInternalWindow`.<br>
@@ -36,25 +38,48 @@ In this example, we'll have 4 parameters:<br>
 Optionaly, when creating your `InternalWindowManager` you can set a initialization code, using the interface `InternalWindowInitializer`, that will be used for all your `InternalWindow`.<br>
 Example:
 ```java
-InternalWindowInitializer<ExampleController> initializer =((controller, stage, internalWindow) -> {
-            controller.doSomething(stage);
-            controller.alsoDoThis(internalWindow);
-        });
-InternalWindowManager imw = InternalWindowManager.create().managing(contentPanel).withInitializer(initializer);
-```
-You can also provide a class that implements `ChildListener`, when you want another class to also listen to `InternalWindow` open and close notifications.<br>
-Example:
-```java
-InternalWindowManager imw = InternalWindowManager.create().managing(contentPanel).withListener(this);
-```
-Complete example:
-```java
-InternalWindowInitializer<ExampleController> initializer =((controller, stage, internalWindow) -> {
+InternalWindowInitializer<ExampleController> initializer = ((controller, stage, internalWindow) -> {
             controller.doSomething(stage);
             controller.alsoDoThis(internalWindow);
         });
 
-InternalWindowManager imw = InternalWindowManager.create().managing(contentPanel).withListener(this).withInitializer(initializer);
+InternalWindowManager imw = InternalWindowManager
+        .create()
+        .managing(contentPanel)
+        .withInitializer(initializer);
+```
+You can also provide a class that implements `ChildListener`, when you want another class to also listen to `InternalWindow` open and close notifications.<br>
+Example:
+```java
+InternalWindowManager imw = InternalWindowManager
+        .create()
+        .managing(contentPanel)
+        .withListener(this);
+```
+Is also possible to set the theme used on all the `InternalWindow`:<br>
+Example:
+```java
+InternalWindowManager imw = InternalWindowManager
+        .create()
+        .managing(contentPanel)
+        .defaultTheme(InternalWindow.Theme.NONACEPT);
+```
+Right now, only two themes exist `JAVAFX` and `NONACEPT`, both can be found as a enumerator internal to `InternalWindow`<br>
+
+Complete example:
+```java
+InternalWindowInitializer<ExampleController> initializer = ((controller, stage, internalWindow) -> {
+            controller.doSomething(stage);
+            controller.alsoDoThis(internalWindow);
+        });
+
+//creates a InternalWindowManager, that have all the options set
+InternalWindowManager imw = InternalWindowManager
+        .create()
+        .managing(contentPanel)
+        .withListener(this)
+        .withInitializer(initializer)
+        .defaultTheme(InternalWindow.Theme.NONACEPT);
 
 //creates a unique window, focus on it if called again
 iwm.createUniqueInternalWindow("/example.fxml",

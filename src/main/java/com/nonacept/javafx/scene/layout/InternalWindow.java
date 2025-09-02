@@ -55,6 +55,8 @@ public class InternalWindow extends Pane {
     private String classId;
     private InternalWindowContent controllerClass;
 
+    private Theme theme;
+
     /**
      * Creates a new instance
      */
@@ -69,6 +71,7 @@ public class InternalWindow extends Pane {
      * @param content the content of the Window
      */
     public InternalWindow(String title, Node content) {
+        theme = Theme.JAVAFX;
         initHeaderBar(title);
         initEffects();
         initResizable(10);
@@ -230,6 +233,29 @@ public class InternalWindow extends Pane {
     }
 
     /**
+     * Get the current theme
+     *
+     * @return the current theme
+     */
+    public Theme getTheme() {
+        return theme;
+    }
+
+    /**
+     * Sets the current theme
+     *
+     * @param theme the theme to be set
+     */
+    public void setTheme(Theme theme) {
+        this.theme = theme;
+        if (isActive()) {
+            setActiveHeader();
+        } else {
+            setInactiveHeader();
+        }
+    }
+
+    /**
      * Adds a {@link ChildListener}
      *
      * @param listener the {@link ChildListener} to be added
@@ -344,13 +370,27 @@ public class InternalWindow extends Pane {
 
     private void setActiveHeader() {
         //headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, blue, lightskyblue);");
-        headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, #3333aa, #6600ff);");
+        switch (theme) {
+            case JAVAFX -> {
+                headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, -fx-accent, -fx-default-button);");
+            }
+            case NONACEPT -> {
+                headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, #3333aa, #6600ff);");
+            }
+        }
         active = true;
     }
 
     private void setInactiveHeader() {
         //headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, gray, lightgray);");
-        headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, #9180aa, #e4d3f6);");
+        switch (theme) {
+            case JAVAFX -> {
+                headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, grey, -fx-selection-bar-non-focused);");
+            }
+            case NONACEPT -> {
+                headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, #9180aa, #e4d3f6);");
+            }
+        }
         active = false;
     }
 
@@ -646,6 +686,11 @@ public class InternalWindow extends Pane {
             height += p.heightProperty().get();
         }
         setMinSize(width, height);
+    }
+
+    public enum Theme {
+        NONACEPT,
+        JAVAFX;
     }
 
 }

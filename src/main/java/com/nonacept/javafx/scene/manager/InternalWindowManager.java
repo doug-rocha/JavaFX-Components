@@ -33,6 +33,8 @@ public class InternalWindowManager implements ChildListener {
     private ChildListener childListener;
     private InternalWindowInitializer<? extends InternalWindowContent> initializer;
 
+    private InternalWindow.Theme defaultTheme = InternalWindow.Theme.JAVAFX;
+
     private InternalWindowManager() {
     }
 
@@ -91,6 +93,11 @@ public class InternalWindowManager implements ChildListener {
         return this;
     }
 
+    public InternalWindowManager defaultTheme(InternalWindow.Theme theme) {
+        defaultTheme = theme;
+        return this;
+    }
+
     public static InternalWindowManager getInstance() {
         if (instance == null) {
             throw new IllegalStateException("Create the InternalWindowManager first", new NullPointerException("instance is null"));
@@ -119,6 +126,7 @@ public class InternalWindowManager implements ChildListener {
             iw.setControllerClass(loader.getController());
             iw.setClassId(className);
             iw.addChildListener(this);
+            iw.setTheme(defaultTheme);
             if (childListener != null) {
                 iw.addChildListener(childListener);
             }
@@ -140,7 +148,6 @@ public class InternalWindowManager implements ChildListener {
     }
 
     public <T extends InternalWindowContent> void createUniqueInternalWindow(String viewLocation, Stage stage, Class<T> type, Consumer<T> customInit) {
-
         String key = type.getName();
         siw(ciw(viewLocation, stage, key, customInit));
     }
@@ -152,6 +159,15 @@ public class InternalWindowManager implements ChildListener {
 
     public <T extends InternalWindowContent> InternalWindow createInternalWindow(String viewLocation, Stage stage, String identifier, Consumer<T> customInit) {
         return ciw(viewLocation, stage, identifier, customInit);
+    }
+
+    public void changeTheme(InternalWindow.Theme theme) {
+        defaultTheme = theme;
+        childs.forEach((obj, node) -> {
+            if (node instanceof InternalWindow iw) {
+                iw.setTheme(defaultTheme);
+            }
+        });
     }
 
     private InternalWindow findActiveInternalWindow(Pane root) {
