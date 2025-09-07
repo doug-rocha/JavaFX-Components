@@ -74,7 +74,7 @@ public class InternalWindow extends Pane {
         theme = Theme.JAVAFX;
         initHeaderBar(title);
         initEffects();
-        initResizable(10);
+        initResizable(5);
         Platform.runLater(this::requestFocus);
         Platform.runLater(this::parentListener);
         if (content != null) {
@@ -557,9 +557,8 @@ public class InternalWindow extends Pane {
         return false;
     }
 
-    //I'm not really sure if this is a good implementation.
     private void initResizable(double mouseBorder) {
-        this.setOnMouseMoved((event) -> {
+        this.addEventFilter(MouseEvent.MOUSE_MOVED, (event) -> {
             if (isMaxed()) {
                 return;
             }
@@ -575,13 +574,13 @@ public class InternalWindow extends Pane {
             resize[2] = false;
             resize[3] = false;
 
-            if (Math.abs(mouseX) < mouseBorder / 2) {
+            if (Math.abs(mouseX) < mouseBorder) {
                 resize[0] = true;
             } else if (Math.abs(mouseX - (width - 15)) < mouseBorder) {
                 resize[1] = true;
             }
 
-            if (Math.abs(-mouseY) < mouseBorder / 2) {
+            if (Math.abs(-mouseY) < mouseBorder) {
                 resize[2] = true;
             } else if (Math.abs(mouseY - (height - 15)) < mouseBorder) {
                 resize[3] = true;
