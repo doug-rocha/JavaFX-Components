@@ -1,15 +1,25 @@
 # NonaCept JavaFX Components
 
+![GitHub release](https://img.shields.io/github/v/release/doug-rocha/JavaFX-Components?style=for-the-badge)
+
+
 Some JavaFX components for making your life easier.
-***
-`nonacept.javafx.scene.layout.InternalWindow`: it's a component rather similar to `JInternalWindow` from Java Swing library.
 
-It offers a JavaFX Node (in fact extends a Pane), and it can be added to another Parent, and have Content added to it. It will be shown as a Window inside your Window, it can be resized, moved, and etc.
+---
 
-### How to use
-For this example, I will assume you already know a bit of JavaFX and have a `Pane` ready to be used as a "Desktop".
+## InternalWindow
 
-First things first, we will create a `InternalWindowManager`, this is a singleton object with a builder like creation:
+`com.nonacept.javafx.scene.layout.InternalWindow` is similar to `JInternalWindow` from Swing.  
+
+It extends `Pane` and can be added to any Parent, allowing content to be added inside a "window within a window". You can **move, resize, and maximize** it.
+
+---
+
+## How to use
+
+For this example, I will assume you already know a bit of JavaFX and have a `Pane` ready to be used as a "Desktop":
+
+### Create the InternalWindowManager
 
 ```java
 InternalWindowManager iwm = InternalWindowManager
@@ -17,63 +27,73 @@ InternalWindowManager iwm = InternalWindowManager
         .managing(contentPanel);
 ```
 After this the object `iwm` can be used to manage the creation of `InternalWindow`.<br>
-You have two methods to create `InternalWindow`, `createInternalWindow` and `createUniqueInternalWindow`.<br>
-+ `createInternalWindow` - will create a `InternalWindow`that can have as many intances as the user opens it.<br>
-+ `createUniqueInternalWindow` - will create a `InternalWindow`that is unique, if you try to create it again, the manager will simply focus this Window for you.<br>
+You can create windows with:
 
-Example:
+- `createInternalWindow` → multiple instances allowed.
+- `createUniqueInternalWindow` → only one instance; focuses if called again. (<b>Note:</b> the uniqueness is based on the type `Class`)
+
 ```java
 iwm.createUniqueInternalWindow("/example.fxml",
-                mainStage, 
+                mainStage,
                 ExampleController.class,
                 customInitConsumer
-                );
+);
 ```
-In this example, we'll have 4 parameters:<br>
-+ `"/example.fxml"` - Is the location of the FXML file, this file will provide the content for the `InternalWindow`.<br>
-+ `mainStage` - Can be `null`. This is the main `Stage` of your application, used if you want to interact with it within your Controller or `InternalWindow`.<br>
-+ `ExampleController.class` - Represents the type of your FXML Controller, it has to implement `InternalWindowContent`.<br>
-+ `customInitConsumer` - A custom `Consumer` receiving the type of your Controller, this will be executed if not null, can be used to run a custom initialization code for this controller.<br>
 
-Optionaly, when creating your `InternalWindowManager` you can set a initialization code, using the interface `InternalWindowInitializer`, that will be used for all your `InternalWindow`.<br>
-Example:
+Parameters:
+
+| Parameter | Description |
+|-----------|-------------|
+| `/example.fxml` | Location of the FXML file |
+| `mainStage` | Main `Stage` (can be null) |
+| `ExampleController.class` | Your FXML controller implementing `InternalWindowContent` (also used to manage the uniqueness)|
+| `customInitConsumer` | Custom code to run on initialization |
+
+<b>Note:</b> every parameter passed when creating the `InternalWindowManager` will be used for all `InternalWindow` created by it.
+
+---
+
+### Optional: Global Initializer
 ```java
-InternalWindowInitializer<ExampleController> initializer = ((controller, stage, internalWindow) -> {
-            controller.doSomething(stage);
-            controller.alsoDoThis(internalWindow);
-        });
+InternalWindowInitializer<ExampleController> initializer = (controller, stage, internalWindow) -> {
+    controller.doSomething(stage);
+    controller.alsoDoThis(internalWindow);
+};
 
 InternalWindowManager imw = InternalWindowManager
         .create()
         .managing(contentPanel)
         .withInitializer(initializer);
 ```
-You can also provide a class that implements `ChildListener`, when you want another class to also listen to `InternalWindow` open and close notifications.<br>
-Example:
-```java
-InternalWindowManager imw = InternalWindowManager
-        .create()
-        .managing(contentPanel)
-        .withListener(this);
-```
-Is also possible to set the theme used on all the `InternalWindow`:<br>
-Example:
-```java
-InternalWindowManager imw = InternalWindowManager
-        .create()
-        .managing(contentPanel)
-        .defaultTheme(InternalWindow.Theme.NONACEPT);
-```
-Right now, only two themes exist `JAVAFX` and `NONACEPT`, both can be found as a enumerator internal to `InternalWindow`<br>
+The global initializer code, will be executed when creating a `InternalWindow`.<br/>
+As you may see the initializer must be a implementation of `InternalWindowInitializer` with a controller type as parameter.<br/>
+<b>Note:</b> if you intend to use InternalWindows with multiple types of controllers, define a more generic Controller class to be used here and extend by the actual Controllers, or use a customInitConsumer for every Window, as the `InternalWindow` creation example.
 
-Complete example:
+---
+
+### Optional: Listener & Theme
+You can provide an Object that implements `ChildListener` in order to receive calls when the `InternalWindow` opens or closes; a `InternalWindow.Theme` can also be passed:
+
+```java
+InternalWindowManager imw = InternalWindowManager
+        .create()
+        .managing(contentPanel)
+        .withListener(this)                             // listens to open/close
+        .defaultTheme(InternalWindow.Theme.NONACEPT);   // set theme
+```
+
+Currently available themes: `JAVAFX` and `NONACEPT`.
+
+---
+
+### Complete Example
+
 ```java
 InternalWindowInitializer<ExampleController> initializer = ((controller, stage, internalWindow) -> {
             controller.doSomething(stage);
             controller.alsoDoThis(internalWindow);
         });
 
-//creates a InternalWindowManager, that have all the options set
 InternalWindowManager imw = InternalWindowManager
         .create()
         .managing(contentPanel)
@@ -81,26 +101,16 @@ InternalWindowManager imw = InternalWindowManager
         .withInitializer(initializer)
         .defaultTheme(InternalWindow.Theme.NONACEPT);
 
-//creates a unique window, focus on it if called again
-iwm.createUniqueInternalWindow("/example.fxml",
-                mainStage,
-                ExampleController.class,
-                customInitConsumer
-                );
-//creates a window, if called again, will open another window
-iwm.createInternalWindow("/example.fxml",
-                mainStage,
-                customInitConsumer
-                );
-
+iwm.createUniqueInternalWindow("/example.fxml", mainStage, ExampleController.class, customInitConsumer);
+iwm.createInternalWindow("/example.fxml", mainStage, customInitConsumer);
 ```
 
-### Images
-**Move**<br>
-![Move](./screen/iw-move.gif)<br>
-<br>
-**Maximize**<br>
-![Maximize](./screen/iw-max.gif)<br>
-<br>
-**Resize**<br>
-![Resize](./screen/iw-resize.gif)
+---
+
+## Screenshots
+
+Click the images to enlarge:
+
+<a href="./screen/iw-move.gif"><img src="./screen/iw-move.gif" width="255" alt="Move"></a>
+<a href="./screen/iw-max.gif"><img src="./screen/iw-max.gif" width="255" alt="Maximize"></a>
+<a href="./screen/iw-resize.gif"><img src="./screen/iw-resize.gif" width="255" alt="Resize"></a>
