@@ -352,7 +352,7 @@ public class InternalWindow extends Pane {
         HBox.setHgrow(wc, Priority.ALWAYS);
         wc.setMaxWidth(Double.MAX_VALUE);
 
-        Image img = new Image(getClass().getResourceAsStream("/x.png"));
+        Image img = new Image(getClass().getResourceAsStream("/icons/x.png"));
         ImageView imgView = new ImageView(img);
         imgView.setFitWidth(14);
         imgView.setFitHeight(14);

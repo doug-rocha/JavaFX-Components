@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.nonacept</groupId>
     <artifactId>javafx-components</artifactId>
-    <version>0.5-SNAPSHOT</version>
+    <version>0.6-SNAPSHOT</version>
     <name>JavaFX Components</name>
     <description>A collection of components for JavaFX</description>
     <packaging>jar</packaging>
