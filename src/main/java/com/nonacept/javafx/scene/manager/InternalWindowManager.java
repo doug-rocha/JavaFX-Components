@@ -95,10 +95,7 @@ public class InternalWindowManager implements ChildListener {
                     nextIndex = (currentIndex + (shift ? -1 : 1) + focusables.size()) % focusables.size();
                 }
                 Node next = focusables.get(nextIndex);
-                while (next.isDisable()) {
-                    nextIndex = (nextIndex + (shift ? -1 : 1) + focusables.size()) % focusables.size();
-                    next = focusables.get(nextIndex);
-                }
+
                 Platform.runLater(next::requestFocus);
             }
         });
@@ -205,7 +202,7 @@ public class InternalWindowManager implements ChildListener {
     private List<Node> collectFocusableNodes(Parent parent) {
         List<Node> result = new ArrayList<>();
         for (Node node : parent.getChildrenUnmodifiable()) {
-            if (node.isFocusTraversable() && node.isVisible()) {
+            if (node.isFocusTraversable() && node.isVisible() && !node.isDisabled()) {
                 result.add(node);
             } else if (node instanceof Parent child) {
                 result.addAll(collectFocusableNodes(child));
