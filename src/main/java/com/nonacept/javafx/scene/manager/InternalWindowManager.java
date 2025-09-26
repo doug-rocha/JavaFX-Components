@@ -42,6 +42,7 @@ import com.nonacept.javafx.listeners.ChildListener;
 import com.nonacept.javafx.scene.layout.InternalWindow;
 import com.nonacept.javafx.scene.layout.InternalWindowContent;
 import com.nonacept.javafx.scene.layout.InternalWindowInitializer;
+import javafx.scene.input.MouseEvent;
 
 /**
  *
@@ -70,24 +71,22 @@ public class InternalWindowManager implements ChildListener {
 
     public InternalWindowManager managing(Pane pane) {
         managedPane = pane;
+        managedPane.setOnMousePressed(event -> verifyFocus(event));
         Scene mainScene = pane.getScene();
-        mainScene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+        managedPane.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.TAB) {
                 InternalWindow activeWindow = findActiveInternalWindow(managedPane);
+                event.consume();
                 if (activeWindow == null) {
                     return;
                 }
-                event.consume();
-
                 Node focusOwner = mainScene.getFocusOwner();
                 List<Node> focusables = collectFocusableNodes(activeWindow);
                 if (focusables.isEmpty()) {
                     return;
                 }
-
                 int currentIndex = focusables.indexOf(focusOwner);
                 boolean shift = event.isShiftDown();
-
                 int nextIndex;
                 if (currentIndex == -1) {
                     nextIndex = 0;
@@ -99,7 +98,6 @@ public class InternalWindowManager implements ChildListener {
                 Platform.runLater(next::requestFocus);
             }
         });
-
         return this;
     }
 
@@ -136,12 +134,6 @@ public class InternalWindowManager implements ChildListener {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(viewLocation));
             Pane p = loader.load();
             iw = new InternalWindow();
-            if (initializer != null) {
-                initializer.accept(loader.getController(), stage, iw);
-            }
-            if (customInit != null) {
-                customInit.accept(loader.getController());
-            }
             iw.addContent(p);
             iw.setControllerClass(loader.getController());
             iw.setClassId(className);
@@ -149,6 +141,12 @@ public class InternalWindowManager implements ChildListener {
             iw.setTheme(defaultTheme);
             if (childListener != null) {
                 iw.addChildListener(childListener);
+            }
+            if (initializer != null) {
+                initializer.accept(loader.getController(), stage, iw);
+            }
+            if (customInit != null) {
+                customInit.accept(loader.getController());
             }
             childs.put(className, iw);
             return iw;
@@ -209,6 +207,16 @@ public class InternalWindowManager implements ChildListener {
             }
         }
         return result;
+    }
+
+    private void verifyFocus(MouseEvent event) {
+        InternalWindow activeWindow = findActiveInternalWindow(managedPane);
+        if (activeWindow == null) {
+            return;
+        }
+        if (!activeWindow.isAncestorOf((Node) event.getTarget())) {
+            activeWindow.releaseFocus();
+        }
     }
 
     @Override

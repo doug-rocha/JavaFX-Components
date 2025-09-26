@@ -191,6 +191,7 @@ public class InternalWindow extends Pane {
      */
     public void setControllerClass(InternalWindowContent controllerClass) {
         this.controllerClass = controllerClass;
+        this.controllerClass.setInternalWindow(this);
     }
 
     /**
@@ -320,7 +321,6 @@ public class InternalWindow extends Pane {
         headerBar.setMinHeight(28);
         headerBar.setAlignment(Pos.CENTER_LEFT);
         headerBar.getChildren().addAll(header, windowControls());
-
         headerBar.setOnMousePressed(e -> {
             if (e.getButton() == MouseButton.PRIMARY && e.getClickCount() == 2) {
                 toggleMaximize();
@@ -351,12 +351,10 @@ public class InternalWindow extends Pane {
         wc.setPadding(new Insets(1, 10, 0, 0));
         HBox.setHgrow(wc, Priority.ALWAYS);
         wc.setMaxWidth(Double.MAX_VALUE);
-
         Image img = new Image(getClass().getResourceAsStream("/icons/x.png"));
         ImageView imgView = new ImageView(img);
         imgView.setFitWidth(14);
         imgView.setFitHeight(14);
-
         Button btnClose = new Button("Fechar");
         btnClose.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         btnClose.setPrefSize(24, 24);
@@ -373,13 +371,12 @@ public class InternalWindow extends Pane {
         shadow.setOffsetX(0);
         shadow.setOffsetY(0);
         shadow.setColor(Color.rgb(0, 0, 0, 0.5));
-
         setEffect(shadow);
     }
 
     private void notifyOthers() {
         clearAllShadows((Pane) getParent());
-        changeAllBorders((Pane) getParent());
+        changeAllHeaders((Pane) getParent());
         restoreAll((Pane) getParent());
     }
 
@@ -417,7 +414,7 @@ public class InternalWindow extends Pane {
         active = false;
     }
 
-    private void changeAllBorders(Pane parent) {
+    private void changeAllHeaders(Pane parent) {
         for (Node node : parent.getChildren()) {
             if (node instanceof InternalWindow iw && !iw.equals(this)) {
                 iw.setInactiveHeader();
@@ -439,6 +436,13 @@ public class InternalWindow extends Pane {
         }
     }
 
+    public void releaseFocus() {
+        if (active) {
+            setEffect(null);
+            setInactiveHeader();
+        }
+    }
+
     private void toggleMaximize() {
         if (!maximizable) {
             return;
@@ -455,13 +459,10 @@ public class InternalWindow extends Pane {
             return;
         }
         restoring = true;
-
         setLayoutX(oldX);
         setLayoutY(oldY);
         container.setPrefSize(oldWidth, oldHeight);
-
         maxed = false;
-
         restoring = false;
 
     }
@@ -471,12 +472,10 @@ public class InternalWindow extends Pane {
             return;
         }
         saveState();
-
         Pane parent = (Pane) getParent();
         setLayoutX(0);
         setLayoutY(0);
         container.setPrefSize(parent.getWidth(), parent.getHeight());
-
         maxed = true;
     }
 
@@ -512,7 +511,6 @@ public class InternalWindow extends Pane {
                 setLayoutX(parent.getWidth() - container.getWidth());
             }
         });
-
         layoutYProperty().addListener((observable, oldValue, newValue) -> {
             if (restoring || newValue.doubleValue() == 0) {
                 return;
