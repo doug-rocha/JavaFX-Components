@@ -170,6 +170,10 @@ public class InternalWindowManager implements ChildListener {
         siw(ciw(viewLocation, stage, key, customInit));
     }
 
+    public <T extends InternalWindowContent> void createUniqueInternalWindow(String viewLocation, Stage stage, String identifier, Consumer<T> customInit) {
+        siw(ciw(viewLocation, stage, identifier, customInit));
+    }
+
     public <T extends InternalWindowContent> void createInternalWindow(String viewLocation, Stage stage, Consumer<T> customInit) {
         String key = "" + System.currentTimeMillis();
         siw(ciw(viewLocation, stage, key, customInit));

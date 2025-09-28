@@ -462,6 +462,9 @@ public class InternalWindow extends Pane {
         setLayoutX(oldX);
         setLayoutY(oldY);
         container.setPrefSize(oldWidth, oldHeight);
+        if (isActive()) {
+            setEffect(shadow);
+        }
         maxed = false;
         restoring = false;
 
@@ -476,6 +479,7 @@ public class InternalWindow extends Pane {
         setLayoutX(0);
         setLayoutY(0);
         container.setPrefSize(parent.getWidth(), parent.getHeight());
+        setEffect(null);
         maxed = true;
     }
 
