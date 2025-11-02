@@ -1,6 +1,7 @@
 # NonaCept JavaFX Components
 
 ![GitHub release](https://img.shields.io/github/v/release/doug-rocha/JavaFX-Components?style=for-the-badge)
+![License](https://img.shields.io/github/license/doug-rocha/JavaFX-Components?style=for-the-badge)
 
 
 Some JavaFX components for making your life easier.
@@ -60,7 +61,7 @@ InternalWindowInitializer<ExampleController> initializer = (controller, stage, i
     controller.alsoDoThis(internalWindow);
 };
 
-InternalWindowManager imw = InternalWindowManager
+InternalWindowManager iwm = InternalWindowManager
         .create()
         .managing(contentPanel)
         .withInitializer(initializer);
@@ -75,7 +76,7 @@ As you may see the initializer must be a implementation of `InternalWindowInitia
 You can provide an Object that implements `ChildListener` in order to receive calls when the `InternalWindow` opens or closes; a `InternalWindow.Theme` can also be passed:
 
 ```java
-InternalWindowManager imw = InternalWindowManager
+InternalWindowManager iwm = InternalWindowManager
         .create()
         .managing(contentPanel)
         .withListener(this)                             // listens to open/close
@@ -94,7 +95,7 @@ InternalWindowInitializer<ExampleController> initializer = ((controller, stage, 
             controller.alsoDoThis(internalWindow);
         });
 
-InternalWindowManager imw = InternalWindowManager
+InternalWindowManager iwm = InternalWindowManager
         .create()
         .managing(contentPanel)
         .withListener(this)

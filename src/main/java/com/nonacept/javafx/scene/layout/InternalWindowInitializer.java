@@ -27,14 +27,72 @@ import java.util.Objects;
 import javafx.stage.Stage;
 
 /**
+ * Functional interface used to initialize an {@link InternalWindow} after its
+ * FXML controller has been loaded.
+ *
+ * <p>
+ * This initializer provides access to:
+ * <ul>
+ * <li>The controller associated with the window</li>
+ * <li>The owner {@link Stage}</li>
+ * <li>The created {@link InternalWindow} instance</li>
+ * </ul>
+ *
+ * <p>
+ * It allows custom configuration logic to be applied right after the internal
+ * window is created and before it is shown.
+ *
+ * <p><b>Typical Usage</b>
+ * <pre>{@code
+ * InternalWindowManager.create()
+ *     .withInitializer((controller, stage, window) -> {
+ *         controller.loadData();
+ *         window.setTitle("User Form");
+ *     });
+ * }</pre>
+ *
+ * <p><b>Chaining Initializers</b><br>
+ * You can combine initializers using
+ * {@link #andThen(InternalWindowInitializer)}:
+ *
+ * <pre>{@code
+ * InternalWindowInitializer<MyController> initA = (c, s, w) -> c.setup();
+ * InternalWindowInitializer<MyController> initB = (c, s, w) -> w.centerOnScreen();
+ *
+ * InternalWindowInitializer<MyController> combined = initA.andThen(initB);
+ * }</pre>
+ *
+ * @param <T> the type of the controller for this internal window
+ *
+ * @see InternalWindow
+ * @see com.nonacept.javafx.scene.manager.InternalWindowManager
  *
  * @author Douglas Rocha de Oliveira
  */
 @FunctionalInterface
 public interface InternalWindowInitializer<T extends InternalWindowContent> {
 
+    /**
+     * Performs initialization logic for an {@link InternalWindow}.
+     *
+     * @param controller the controller instance associated with the window
+     * @param stage the owning {@link Stage}
+     * @param internalWindow the window being initialized
+     */
     void accept(T controller, Stage stage, InternalWindow internalWindow);
 
+    /**
+     * Returns a composed initializer that executes this initializer first,
+     * followed by the {@code after} initializer.
+     *
+     * <p>
+     * This allows multiple configurations to be chained in a clean, declarative
+     * way.
+     *
+     * @param after the initializer to run after this one
+     * @return a composed initializer that performs both initializations
+     * @throws NullPointerException if {@code after} is {@code null}
+     */
     default InternalWindowInitializer<T> andThen(InternalWindowInitializer<? super T> after) {
         Objects.requireNonNull(after);
         return (controller, stage, internalWindow) -> {

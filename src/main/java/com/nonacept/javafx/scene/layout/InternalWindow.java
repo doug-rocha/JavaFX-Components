@@ -48,8 +48,35 @@ import javafx.scene.text.Font;
 import com.nonacept.javafx.listeners.ChildListener;
 
 /**
- * A Node that works like a {@link javax.swing.JInternalFrame}, it can be a
- * child of a {@link Pane}, and can be moved, resized and closed;
+ * A floating window component similar to Swing's
+ * {@link javax.swing.JInternalFrame}, designed for JavaFX applications.
+ *
+ * <p>
+ * This component can be placed inside a {@link Pane} and supports:
+ * <ul>
+ * <li>Move/drag</li>
+ * <li>Resize (optional)</li>
+ * <li>Maximize/restore</li>
+ * <li>Close</li>
+ * <li>Active window focus highlight</li>
+ * </ul>
+ *
+ * <p>
+ * Basic usage example:
+ * <pre>{@code
+ * InternalWindow window = new InternalWindow("Settings", new Label("Panel content"));
+ * rootPane.getChildren().add(window);
+ * }</pre>
+ *
+ * <p>
+ * Adding dynamic content:
+ * <pre>{@code
+ * VBox content = new VBox(new Label("Hello"));
+ * window.addContent(content);
+ * }</pre>
+ *
+ * This component mimics desktop-like window behavior within a JavaFX
+ * scene.
  *
  * @author Douglas Rocha de Oliveira
  */
@@ -116,10 +143,20 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Add a Node to the InternalWindow
+     * Adds a Node as the main content of this window.
      *
-     * @param content the Node to be added
-     * @return true if the Node is added successfully
+     * <p>
+     * The content will grow to fill the available space.
+     *
+     * @param content node to add
+     * @return true if the node was added
+     *
+     * <p>
+     * Example:
+     *
+     * <pre>{@code
+     * window.addContent(new TextArea());
+     * }</pre>
      */
     public boolean addContent(Node content) {
         VBox.setVgrow(content, Priority.ALWAYS);
@@ -138,7 +175,7 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Set the title of the InternalWindow, shown on the title bar
+     * Sets the title shown in the window header bar.
      *
      * @param title the title of the InternalWindow
      */
@@ -147,17 +184,18 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Get the title of the InternalWindow
-     *
-     * @return the title of the InternalWindow
+     * @return the text displayed in the window header bar
      */
     public String getTitle() {
         return header.getText();
     }
 
     /**
-     * Set the classId String, it's used to identify itself to the
-     * {@link ChildListener}
+     * Sets an identifier used by {@link ChildListener} to recognize this
+     * window.
+     *
+     * <p>
+     * Useful when managing multiple window types.
      *
      * @param classId the ControllerClass String
      */
@@ -166,10 +204,7 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Gets the classId String, used to identify itself to the
-     * {@link ChildListener}
-     *
-     * @return the value of classId
+     * @return identifier used for ChildListener communication
      */
     public String getClassId() {
         return classId;
@@ -185,9 +220,13 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Set the ControllerClass field
+     * Sets the controller associated with this window.
      *
-     * @param controllerClass the controllerClass field
+     * @param controllerClass instance implementing
+     * {@link InternalWindowContent}
+     *
+     * <p>
+     * The controller receives a reference to this window.
      */
     public void setControllerClass(InternalWindowContent controllerClass) {
         this.controllerClass = controllerClass;
@@ -195,9 +234,7 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Checks if this InternalWindow can be resized
-     *
-     * @return true if can be resized
+     * @return true if the window can be resized by the user
      */
     @Override
     public boolean isResizable() {
@@ -205,7 +242,7 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Sets if this InternalWindow can be resized
+     * Enables or disables resizing via window borders.
      *
      * @param resizable the valu for resizable
      */
@@ -214,16 +251,14 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Checks if this InternalWindow can be maximized
-     *
-     * @return true if it's maximizable
+     * @return true if this window supports maximize/restore
      */
     public boolean isMaximizable() {
         return maximizable;
     }
 
     /**
-     * Sets wheter this can be maximized
+     * Enables or disables maximize/restore functionality.
      *
      * @param maximizable the value for maximizable
      */
@@ -545,8 +580,11 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Remove itself from the {@link Parent} and notify all
-     * {@link ChildListener} using {@link InternalWindow#notifyClosedChild() }
+     * Closes the window, removes it from its parent, and notifies listeners.
+     *
+     * <p>
+     * Closing can be blocked by controller via
+     * {@link InternalWindowContent#canClose()}.
      */
     public void close() {
         if (!controllerClass.canClose()) {
@@ -566,11 +604,10 @@ public class InternalWindow extends Pane {
     }
 
     /**
-     * Check if this InternalWindow is on the tree of a component. Used to
-     * process the focus change when clicked on a Node of a InternalWindow
+     * Checks whether a given Node belongs to this window hierarchy.
      *
-     * @param node the Node to be checked
-     * @return true if the node is on the Node tree of this InternalWindow
+     * @param node node to test
+     * @return true if the node is part of this InternalWindow
      */
     public boolean isAncestorOf(Node node) {
         while (node != null) {
@@ -712,6 +749,14 @@ public class InternalWindow extends Pane {
         setMinSize(width, height);
     }
 
+    /**
+     * Defines the header style theme.
+     *
+     * <p>
+     * {@code JAVAFX} uses JavaFX accent colors.
+     * <p>
+     * {@code NONACEPT} uses custom gradient colors.
+     */
     public enum Theme {
         NONACEPT,
         JAVAFX;

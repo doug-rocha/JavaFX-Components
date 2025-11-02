@@ -45,6 +45,38 @@ import com.nonacept.javafx.scene.layout.InternalWindowInitializer;
 import javafx.scene.input.MouseEvent;
 
 /**
+ * Singleton manager for {@link InternalWindow} instances.
+ *
+ * <p>
+ * This class handles the creation, management, and focus control of internal
+ * windows inside a {@link Pane}, emulating a
+ * {@link javax.swing.JDesktopPane}-like behavior in JavaFX.</p>
+ *
+ * <p>
+ * It also handles keyboard traversal (Tab focus), window theming, and
+ * communicates with child listeners.</p>
+ *
+ * <p>
+ * Usage example:
+ * <pre>{@code
+ * Pane desktopPane = new Pane();
+ * InternalWindowManager manager = InternalWindowManager.create()
+ *     .managing(desktopPane)
+ *     .defaultTheme(InternalWindow.Theme.NONACEPT)
+ *     .withListener(myChildListener)
+ *     .withInitializer((controller, stage, window) -> {
+ *         // custom initialization
+ *     });
+ *
+ * // Create and show a unique internal window
+ * manager.createUniqueInternalWindow("/views/MyView.fxml", stage, MyController.class, ctrl -> {
+ *     ctrl.initData(someData);
+ * });
+ * }</pre>
+ *
+ * @see InternalWindow
+ * @see InternalWindowContent
+ * @see ChildListener
  *
  * @author Douglas Rocha de Oliveira
  */
@@ -62,6 +94,11 @@ public class InternalWindowManager implements ChildListener {
     private InternalWindowManager() {
     }
 
+    /**
+     * Creates (or returns existing) singleton instance.
+     *
+     * @return InternalWindowManager instance
+     */
     public static InternalWindowManager create() {
         if (instance == null) {
             instance = new InternalWindowManager();
@@ -69,6 +106,16 @@ public class InternalWindowManager implements ChildListener {
         return instance;
     }
 
+    /**
+     * Sets the {@link Pane} to be managed by this manager.
+     *
+     * <p>
+     * The manager will add internal windows to this pane and handle focus and
+     * keyboard traversal.</p>
+     *
+     * @param pane the container Pane
+     * @return this manager
+     */
     public InternalWindowManager managing(Pane pane) {
         managedPane = pane;
         managedPane.setOnMousePressed(event -> verifyFocus(event));
@@ -101,21 +148,46 @@ public class InternalWindowManager implements ChildListener {
         return this;
     }
 
+    /**
+     * Sets a {@link ChildListener} to receive notifications of child window
+     * events.
+     *
+     * @param listener the listener
+     * @return this manager
+     */
     public InternalWindowManager withListener(ChildListener listener) {
         childListener = listener;
         return this;
     }
 
+    /**
+     * Sets a custom {@link InternalWindowInitializer} for all created windows.
+     *
+     * @param init the initializer
+     * @return this manager
+     */
     public InternalWindowManager withInitializer(InternalWindowInitializer<? extends InternalWindowContent> init) {
         initializer = init;
         return this;
     }
 
+    /**
+     * Sets the default theme for all new internal windows.
+     *
+     * @param theme the theme
+     * @return this manager
+     */
     public InternalWindowManager defaultTheme(InternalWindow.Theme theme) {
         defaultTheme = theme;
         return this;
     }
 
+    /**
+     * Returns the singleton instance.
+     *
+     * @return the InternalWindowManager singleton
+     * @throws IllegalStateException if the manager hasn't been created yet
+     */
     public static InternalWindowManager getInstance() {
         if (instance == null) {
             throw new IllegalStateException("Create the InternalWindowManager first", new NullPointerException("instance is null"));
@@ -165,24 +237,70 @@ public class InternalWindowManager implements ChildListener {
         managedPane.getChildren().add(iw);
     }
 
+    /**
+     * Creates and shows a unique internal window identified by the controller
+     * class.
+     *
+     * <p>
+     * If a window with the same controller already exists, it will be focused
+     * instead of creating a new one.</p>
+     *
+     * @param viewLocation FXML location
+     * @param stage owner stage
+     * @param type controller class
+     * @param customInit custom initialization for the controller
+     */
     public <T extends InternalWindowContent> void createUniqueInternalWindow(String viewLocation, Stage stage, Class<T> type, Consumer<T> customInit) {
         String key = type.getName();
         siw(ciw(viewLocation, stage, key, customInit));
     }
 
+    /**
+     * Creates and shows a unique internal window identified by a string.
+     *
+     * <p>
+     * If a window with the same identifier already exists, it will be focused
+     * instead of creating a new one.</p>
+     *
+     * @param viewLocation FXML location
+     * @param stage owner stage
+     * @param identifier custom identifier
+     * @param customInit custom initialization for the controller
+     */
     public <T extends InternalWindowContent> void createUniqueInternalWindow(String viewLocation, Stage stage, String identifier, Consumer<T> customInit) {
         siw(ciw(viewLocation, stage, identifier, customInit));
     }
 
+    /**
+     * Creates a new internal window without uniqueness constraint.
+     *
+     * @param viewLocation FXML location
+     * @param stage owner stage
+     * @param customInit custom initialization
+     */
     public <T extends InternalWindowContent> void createInternalWindow(String viewLocation, Stage stage, Consumer<T> customInit) {
         String key = "" + System.currentTimeMillis();
         siw(ciw(viewLocation, stage, key, customInit));
     }
 
+    /**
+     * Creates and returns an internal window without adding it to the pane.
+     *
+     * @param viewLocation FXML location
+     * @param stage owner stage
+     * @param identifier custom identifier
+     * @param customInit custom initialization
+     * @return InternalWindow instance
+     */
     public <T extends InternalWindowContent> InternalWindow createInternalWindow(String viewLocation, Stage stage, String identifier, Consumer<T> customInit) {
         return ciw(viewLocation, stage, identifier, customInit);
     }
 
+    /**
+     * Changes the theme of all managed internal windows.
+     *
+     * @param theme the new theme
+     */
     public void changeTheme(InternalWindow.Theme theme) {
         defaultTheme = theme;
         childs.forEach((obj, node) -> {
@@ -227,6 +345,11 @@ public class InternalWindowManager implements ChildListener {
     public void onChildOpen(Object obj) {
     }
 
+    /**
+     * Closes a child window (called automatically when window closes).
+     *
+     * @param obj child object
+     */
     @Override
     public void onChildClose(Object obj) {
         childs.remove(obj);
