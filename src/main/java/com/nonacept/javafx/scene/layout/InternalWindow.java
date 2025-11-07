@@ -75,8 +75,7 @@ import com.nonacept.javafx.listeners.ChildListener;
  * window.addContent(content);
  * }</pre>
  *
- * This component mimics desktop-like window behavior within a JavaFX
- * scene.
+ * This component mimics desktop-like window behavior within a JavaFX scene.
  *
  * @author Douglas Rocha de Oliveira
  */
@@ -139,7 +138,11 @@ public class InternalWindow extends Pane {
 
         getChildren().add(container);
         setPrefSize(100, 100);
-
+        sceneProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                loadCSS();
+            }
+        });
     }
 
     /**
@@ -307,11 +310,12 @@ public class InternalWindow extends Pane {
      */
     public void setTheme(Theme theme) {
         this.theme = theme;
-        if (isActive()) {
-            setActiveHeader();
-        } else {
-            setInactiveHeader();
-        }
+        loadCSS();
+//        if (isActive()) {
+//            setActiveHeader();
+//        } else {
+//            setInactiveHeader();
+//        }
     }
 
     /**
@@ -386,7 +390,7 @@ public class InternalWindow extends Pane {
         wc.setPadding(new Insets(1, 10, 0, 0));
         HBox.setHgrow(wc, Priority.ALWAYS);
         wc.setMaxWidth(Double.MAX_VALUE);
-        Image img = new Image(getClass().getResourceAsStream("/icons/x.png"));
+        Image img = new Image(getClass().getResourceAsStream("/com/nonacept/icons/x.png"));
         ImageView imgView = new ImageView(img);
         imgView.setFitWidth(14);
         imgView.setFitHeight(14);
@@ -394,6 +398,7 @@ public class InternalWindow extends Pane {
         btnClose.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         btnClose.setPrefSize(24, 24);
         btnClose.setGraphic(imgView);
+        btnClose.getStyleClass().add("close-button");
         btnClose.setOnAction((event) -> {
             close();
         });
@@ -424,28 +429,14 @@ public class InternalWindow extends Pane {
     }
 
     private void setActiveHeader() {
-        //headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, blue, lightskyblue);");
-        switch (theme) {
-            case JAVAFX -> {
-                headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, -fx-accent, -fx-default-button);");
-            }
-            case NONACEPT -> {
-                headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, #3333aa, #6600ff);");
-            }
-        }
+        headerBar.getStyleClass().remove("inactive-header-bar");
+        headerBar.getStyleClass().add("active-header-bar");
         active = true;
     }
 
     private void setInactiveHeader() {
-        //headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, gray, lightgray);");
-        switch (theme) {
-            case JAVAFX -> {
-                headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, grey, -fx-selection-bar-non-focused);");
-            }
-            case NONACEPT -> {
-                headerBar.setStyle("-fx-background-color: linear-gradient(to bottom right, #9180aa, #e4d3f6);");
-            }
-        }
+        headerBar.getStyleClass().add("inactive-header-bar");
+        headerBar.getStyleClass().remove("active-header-bar");
         active = false;
     }
 
@@ -749,6 +740,14 @@ public class InternalWindow extends Pane {
         setMinSize(width, height);
     }
 
+    private void loadCSS() {
+        if (getScene() == null) {
+            return;
+        }
+        getScene().getStylesheets().clear();
+        getScene().getStylesheets().add(getClass().getResource(theme.getCssFile()).toExternalForm());
+    }
+
     /**
      * Defines the header style theme.
      *
@@ -758,8 +757,24 @@ public class InternalWindow extends Pane {
      * {@code NONACEPT} uses custom gradient colors.
      */
     public enum Theme {
-        NONACEPT,
-        JAVAFX;
+        NONACEPT("nonacept.css"),
+        JAVAFX("javafx.css");
+
+        private final String cssFile;
+        private static final String themeLocation = "/com/nonacept/javafx/styles/";
+
+        private Theme(String css) {
+            this.cssFile = css;
+        }
+
+        public String getCssFile() {
+            return themeLocation + cssFile;
+        }
+
+        public String getCssFileName() {
+            return cssFile;
+        }
+
     }
 
 }
