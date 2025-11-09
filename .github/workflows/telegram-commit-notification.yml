@@ -1,0 +1,25 @@
+name: Telegram Commit Notification
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  telegram-commit-notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram Commit Notification
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            📢 *Novo commit no repositório:* `${{ github.repository }}`
+            
+            🧑 *Autor:* ${{ github.actor }}
+            
+            📝 *Mensagem:* ${{ github.event.head_commit.message }}
+            
+            🔗 [Ver commit](${{ github.event.head_commit.url }})
+          format: markdown
