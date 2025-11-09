@@ -34,7 +34,3 @@ THE SOFTWARE.
 .inactive-header-bar{
     -fx-background-color: linear-gradient(to bottom right, #9180aa, #e4d3f6);
 }
-
-.close-button:focused{
-    -fx-effect: dropshadow(gaussian, cyan, 6, 0, 0, 0);
-}

@@ -26,7 +26,12 @@ THE SOFTWARE.
     Author     : Douglas Rocha de Oliveira
 */
 .close-button{
-    -fx-background-color: #ff7777;
+    -fx-background-color: rgba(255, 200, 200, 0.3);
+}
+
+.close-button:focused{
+    -fx-background-color: rgba(255, 68, 68, 0.7);
+    -fx-effect: dropshadow(gaussian, -fx-focus-color, 6, 0, 0, 0);
 }
 
 .close-button:hover{
@@ -35,8 +40,4 @@ THE SOFTWARE.
 
 .close-button:pressed{
     -fx-background-color: #cc2222;
-}
-
-.close-button:focused{
-    -fx-effect: dropshadow(gaussian, -fx-focus-color, 6, 0, 0, 0);
 }
