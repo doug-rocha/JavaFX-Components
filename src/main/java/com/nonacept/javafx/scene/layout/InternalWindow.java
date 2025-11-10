@@ -81,6 +81,9 @@ import com.nonacept.javafx.listeners.ChildListener;
  */
 public class InternalWindow extends Pane {
 
+    private final static String INACTIVE_HEADER_BAR = "inactive-header-bar";
+    private final static String ACTIVE_HEADER_BAR = "active-header-bar";
+
     private final Set<ChildListener> childListeners = new HashSet<>();
 
     private static DropShadow shadow = new DropShadow();
@@ -428,15 +431,16 @@ public class InternalWindow extends Pane {
         }
     }
 
+    //@todo why does this is needed???????
     private void setActiveHeader() {
-        headerBar.getStyleClass().remove("inactive-header-bar");
-        headerBar.getStyleClass().add("active-header-bar");
+        headerBar.getStyleClass().clear();
+        headerBar.getStyleClass().add(ACTIVE_HEADER_BAR);
         active = true;
     }
 
     private void setInactiveHeader() {
-        headerBar.getStyleClass().add("inactive-header-bar");
-        headerBar.getStyleClass().remove("active-header-bar");
+        headerBar.getStyleClass().clear();
+        headerBar.getStyleClass().add(INACTIVE_HEADER_BAR);
         active = false;
     }
 
@@ -459,6 +463,7 @@ public class InternalWindow extends Pane {
             this.toFront();
             setEffect(shadow);
             setActiveHeader();
+            getScene().getRoot().applyCss();
         }
     }
 
@@ -466,6 +471,7 @@ public class InternalWindow extends Pane {
         if (active) {
             setEffect(null);
             setInactiveHeader();
+            getScene().getRoot().applyCss();
         }
     }
 
