@@ -431,7 +431,6 @@ public class InternalWindow extends Pane {
         }
     }
 
-    //@todo why does this is needed???????
     private void setActiveHeader() {
         headerBar.getStyleClass().clear();
         headerBar.getStyleClass().add(ACTIVE_HEADER_BAR);
@@ -708,11 +707,6 @@ public class InternalWindow extends Pane {
             if (isMaxed() || !isResizing()) {
                 return;
             }
-            /*
-            if it's the first click, it calculates the minimum size.
-            I'm kinda sleepy, so possibly I'm not getting something, but for some reason, getMinWidth (or widthProperty().get()) don't return the actual size
-            making a nightmare to resize properly, in fact it always return 100 (the default value, as it is in the constructor)
-             */
             if (initial) {
                 calculateMin();
                 initial = false;
@@ -724,7 +718,8 @@ public class InternalWindow extends Pane {
                     getLayoutX(),
                     getLayoutY(),
                     container.getWidth(),
-                    container.getHeight()});
+                    container.getHeight()
+                });
             }
         });
     }
@@ -736,12 +731,15 @@ public class InternalWindow extends Pane {
     private void calculateMin() {
         double width = 0;
         double height = 0;
-        for (Node n : getChildren()) {
-            Pane p = (Pane) n;
-            if (p.widthProperty().get() > width) {
-                width = p.widthProperty().get();
+        for (Node n : container.getChildren()) {
+            if (n instanceof Pane p) {
+                if (p.minWidthProperty().get() > width) {
+                    width = p.minWidthProperty().get();
+                }
+                double tempHeight = p.minHeightProperty().get();
+                tempHeight = tempHeight < 0 ? p.heightProperty().get() : tempHeight;
+                height += tempHeight;
             }
-            height += p.heightProperty().get();
         }
         setMinSize(width, height);
     }
