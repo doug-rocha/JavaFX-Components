@@ -34,3 +34,20 @@ THE SOFTWARE.
 .inactive-header-bar{
     -fx-background-color: linear-gradient(to bottom right, #9180aa, #e4d3f6);
 }
+
+.active-header-bar .close-button{
+    -fx-background-color: rgba(255, 200, 200, 0.9);
+}
+
+.active-header-bar .close-button:focused{
+    -fx-background-color: rgba(255, 68, 68, 0.7);
+    -fx-effect: dropshadow(gaussian, -fx-focus-color, 6, 0, 0, 0);
+}
+
+.active-header-bar .close-button:hover{
+    -fx-background-color: #ff4444;
+}
+
+.active-header-bar .close-button:pressed{
+    -fx-background-color: #cc2222;
+}
